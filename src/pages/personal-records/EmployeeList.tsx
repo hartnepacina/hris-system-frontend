@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, Plus, Eye, Edit, Trash2, X, Users, UserCheck, UserX, Filter } from 'lucide-react';
+import { Search, Plus, Eye, Edit, X, Users, UserCheck, UserX, Filter } from 'lucide-react';
 
 interface Employee {
     id: number;
@@ -93,10 +93,6 @@ const EmployeeList = () => {
         setShowViewPanel(true);
     };
 
-    const openDelete = (emp: Employee) => {
-        setSelectedEmployee(emp);
-        setShowDeleteDialog(true);
-    };
 
     const FormFields = ({ onSubmit, submitLabel }: { onSubmit: () => void; submitLabel: string }) => (
         <div className="space-y-4">
@@ -241,9 +237,6 @@ const EmployeeList = () => {
                                             </button>
                                             <button onClick={() => openEdit(emp)} className="btn-ghost btn-icon text-emerald-600 hover:bg-emerald-50" title="Edit">
                                                 <Edit className="w-4 h-4" />
-                                            </button>
-                                            <button onClick={() => openDelete(emp)} className="btn-ghost btn-icon text-red-500 hover:bg-red-50" title="Delete">
-                                                <Trash2 className="w-4 h-4" />
                                             </button>
                                         </div>
                                     </td>
