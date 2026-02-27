@@ -6,7 +6,6 @@ type LeaveStatus = 'Pending' | 'Approved' | 'Rejected';
 
 const LeaveManagement = () => {
     const [activeTab, setActiveTab] = useState<Tab>('request');
-    const [showApplyModal, setShowApplyModal] = useState(false);
     const [showBalanceHistory, setShowBalanceHistory] = useState(false);
     const [selectedEmployee, setSelectedEmployee] = useState('');
 
@@ -91,9 +90,6 @@ const LeaveManagement = () => {
                     <h1>Leave Management</h1>
                     <p>Manage leave requests, balances, and history</p>
                 </div>
-                <button onClick={() => setShowApplyModal(true)} className="btn btn-primary">
-                    <Plus className="w-4 h-4" /> Apply for Leave
-                </button>
             </div>
 
             {/* Stat Cards */}
@@ -223,38 +219,6 @@ const LeaveManagement = () => {
                     )}
                 </div>
             </div>
-
-            {/* Apply for Leave Modal */}
-            {showApplyModal && (
-                <div className="pro-modal-overlay">
-                    <div className="pro-modal max-w-md" onClick={e => e.stopPropagation()}>
-                        <div className="pro-modal-header">
-                            <h3>Apply for Leave</h3>
-                            <button onClick={() => setShowApplyModal(false)} className="btn-ghost btn-icon"><X className="w-5 h-5 text-gray-400" /></button>
-                        </div>
-                        <div className="pro-modal-body space-y-4">
-                            <div><label className="pro-label">Employee</label><input type="text" className="pro-input" placeholder="Search employee..." /></div>
-                            <div>
-                                <label className="pro-label">Leave Type</label>
-                                <select className="pro-select">
-                                    <option>Vacation Leave</option>
-                                    <option>Sick Leave</option>
-                                    <option>Emergency Leave</option>
-                                </select>
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div><label className="pro-label">Start Date</label><input type="date" className="pro-input" /></div>
-                                <div><label className="pro-label">End Date</label><input type="date" className="pro-input" /></div>
-                            </div>
-                            <div><label className="pro-label">Reason</label><textarea rows={3} className="pro-input resize-none" placeholder="Reason for leave..." /></div>
-                        </div>
-                        <div className="pro-modal-footer">
-                            <button onClick={() => setShowApplyModal(false)} className="btn btn-secondary">Cancel</button>
-                            <button onClick={() => setShowApplyModal(false)} className="btn btn-primary">Submit Application</button>
-                        </div>
-                    </div>
-                </div>
-            )}
 
             {/* Balance History Modal */}
             {showBalanceHistory && (
