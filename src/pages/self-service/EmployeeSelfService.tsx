@@ -1,417 +1,216 @@
-import { useState } from "react";
-import {
-  User,
-  FileText,
-  Calendar,
-  Bell,
-  Clock,
-  Download,
-  Eye,
-  Plus,
-  X,
-} from "lucide-react";
+import { User, FileText, Clock, Calendar, Download, Eye, Edit, ChevronRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useLeave } from '../../context/LeaveContext';
 
-type Tab = "profile" | "payslips" | "leave" | "attendance" | "requests";
+const CURRENT_USER = 'Dela Cruz, Juan';
 
 const EmployeeSelfService = () => {
-  const [activeTab, setActiveTab] = useState<Tab>("profile");
-  const [showApplyModal, setShowApplyModal] = useState(false);
+    const navigate = useNavigate();
+    const { leaveRequests } = useLeave();
 
-  const tabs = [
-    { id: "profile" as Tab, label: "My Profile", icon: User },
-    { id: "payslips" as Tab, label: "My Payslips", icon: FileText },
-    { id: "leave" as Tab, label: "My Leave", icon: Calendar },
-    { id: "attendance" as Tab, label: "My Attendance", icon: Clock },
-    { id: "requests" as Tab, label: "My Requests", icon: Bell },
-  ];
+    const profile = {
+        name: 'Juan Dela Cruz',
+        id: 'EMP-001',
+        position: 'Admin Officer',
+        department: 'Administration',
+        email: 'juan.delacruz@simplevia.com',
+        phone: '+63 912 345 6789',
+        hireDate: 'January 15, 2024',
+        status: 'Active',
+    };
 
-  const profile = {
-    name: "Juan Dela Cruz",
-    id: "EMP-001",
-    position: "Admin Officer",
-    department: "Administration",
-    email: "juan.delacruz@simplevia.com",
-    phone: "+63 912 345 6789",
-    hireDate: "January 15, 2024",
-    status: "Active",
-  };
+    const recentAttendance = [
+        { date: 'Feb 18, 2026', time: '07:55 AM - 05:05 PM', status: 'On Time' },
+        { date: 'Feb 17, 2026', time: '08:10 AM - 05:00 PM', status: 'Late' },
+        { date: 'Feb 16, 2026', time: '07:50 AM - 05:15 PM', status: 'On Time' },
+    ];
 
-  const payslips = [
-    { period: "Feb 1-15, 2026", netPay: "₱28,500", date: "Feb 15, 2026" },
-    { period: "Jan 16-31, 2026", netPay: "₱28,500", date: "Jan 31, 2026" },
-    { period: "Jan 1-15, 2026", netPay: "₱27,800", date: "Jan 15, 2026" },
-  ];
+    // Get current user's recent leaves from shared context
+    const myLeaves = leaveRequests
+        .filter(r => r.employee === CURRENT_USER)
+        .slice(0, 2);
 
-  const myLeave = {
-    vacation: { total: 15, used: 5, remaining: 10 },
-    sick: { total: 15, used: 3, remaining: 12 },
-    emergency: { total: 5, used: 1, remaining: 4 },
-  };
+    const payslips = [
+        { period: 'Feb 1-15, 2026', paidDate: 'Feb 15, 2026', amount: '₱28,500' },
+        { period: 'Jan 16-31, 2026', paidDate: 'Jan 31, 2026', amount: '₱28,500' },
+    ];
 
-  const myAttendance = [
-    {
-      date: "2026-02-25",
-      timeIn: "07:55 AM",
-      timeOut: "05:01 PM",
-      status: "Present",
-      hours: "8.1",
-    },
-    {
-      date: "2026-02-24",
-      timeIn: "08:10 AM",
-      timeOut: "05:30 PM",
-      status: "Late",
-      hours: "8.3",
-    },
-    {
-      date: "2026-02-23",
-      timeIn: "07:45 AM",
-      timeOut: "06:00 PM",
-      status: "Present",
-      hours: "9.25",
-    },
-  ];
+    const statusBadge: Record<string, string> = {
+        Pending: 'badge-warning',
+        Approved: 'badge-success',
+        Rejected: 'badge-danger',
+    };
 
-  const myRequests = [
-    {
-      type: "Leave Request",
-      date: "2026-02-20",
-      details: "Vacation Leave - 3 days",
-      status: "Pending",
-    },
-    {
-      type: "Overtime Request",
-      date: "2026-02-18",
-      details: "2 hours - Project deadline",
-      status: "Approved",
-    },
-    {
-      type: "Certificate Request",
-      date: "2026-02-15",
-      details: "Certificate of Employment",
-      status: "Completed",
-    },
-  ];
+    const attendanceBadgeColor: Record<string, string> = {
+        'On Time': '#059669',
+        'Late': '#dc2626',
+    };
 
-  const statusBadge: Record<string, string> = {
-    Present: "badge-success",
-    Late: "badge-warning",
-    Absent: "badge-danger",
-    Pending: "badge-warning",
-    Approved: "badge-success",
-    Completed: "badge-info",
-    Active: "badge-success",
-  };
-
-  return (
-    <div className="space-y-6">
-      <div className="page-header">
-        <h1>Employee Self-Service</h1>
-        <p>View your personal information, payslips, and submit requests</p>
-      </div>
-
-      {/* Banner */}
-
-      <div
-        className="rounded-2xl overflow-hidden"
-        style={{
-          background: "linear-gradient(135deg,#059669,#10b981,#34d399)",
-        }}
-      >
-        <div className="p-6 flex items-center gap-5">
-          <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center text-white text-2xl font-bold border-2 border-white/30">
-            JD
-          </div>
-
-          <div>
-            <h2 className="text-xl font-bold text-white">{profile.name}</h2>
-
-            <p className="text-emerald-100 text-sm">
-              {profile.position} • {profile.department}
-            </p>
-
-            <span className="inline-flex items-center gap-1.5 mt-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-white/20 text-white">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-200" />
-              {profile.status}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* Tabs */}
-
-      <div className="pro-card">
-        <div className="px-6 pt-4">
-          <div className="pro-tabs">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`pro-tab flex items-center gap-2 ${activeTab === tab.id ? "active" : ""}`}
-              >
-                <tab.icon className="w-4 h-4" />
-                {tab.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="p-6">
-          {/* PROFILE */}
-
-          {activeTab === "profile" && (
-            <div className="grid md:grid-cols-2 gap-5">
-              {Object.entries(profile).map(([k, v]) => (
-                <div
-                  key={k}
-                  className="p-4 bg-gray-50 rounded-xl border border-gray-100"
-                >
-                  <p className="text-xs text-gray-400 uppercase">{k}</p>
-
-                  <p className="text-sm font-semibold">{v}</p>
-                </div>
-              ))}
+    return (
+        <div className="space-y-6">
+            {/* Header */}
+            <div className="page-header animate-fade-in-up">
+                <h1>Employee Dashboard</h1>
+                <p>Welcome back! Here is a quick overview of your work details.</p>
             </div>
-          )}
 
-          {/* PAYSLIPS */}
-
-          {activeTab === "payslips" && (
-            <div className="space-y-3">
-              {payslips.map((p) => (
-                <div
-                  key={p.period}
-                  className="pro-card border border-gray-100 flex justify-between"
-                >
-                  <div>
-                    <p className="font-bold">{p.period}</p>
-
-                    <p className="text-xs text-gray-400">{p.date}</p>
-                  </div>
-
-                  <div className="flex gap-3">
-                    <p className="font-bold text-emerald-600">{p.netPay}</p>
-
-                    <button className="btn-ghost btn-icon text-blue-500">
-                      <Eye className="w-4 h-4" />
-                    </button>
-
-                    <button className="btn-ghost btn-icon">
-                      <Download className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* LEAVE */}
-
-          {activeTab === "leave" && (
-            <div className="space-y-5">
-              <div className="flex justify-end">
-                <button
-                  onClick={() => setShowApplyModal(true)}
-                  className="btn btn-primary"
-                >
-                  <Plus className="w-4 h-4" />
-                  Apply for Leave
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {[
-                  {
-                    label: "Vacation Leave",
-                    ...myLeave.vacation,
-                    gradient: "linear-gradient(135deg,#059669,#10b981)",
-                  },
-                  {
-                    label: "Sick Leave",
-                    ...myLeave.sick,
-                    gradient: "linear-gradient(135deg,#d97706,#f59e0b)",
-                  },
-                  {
-                    label: "Emergency Leave",
-                    ...myLeave.emergency,
-                    gradient: "linear-gradient(135deg,#dc2626,#ef4444)",
-                  },
-                ].map((l) => (
-                  <div
-                    key={l.label}
-                    className="rounded-xl p-5 border border-gray-100 bg-white"
-                  >
-                    <div className="flex items-center gap-3 mb-3">
-                      <div
-                        className="w-9 h-9 rounded-lg flex items-center justify-center text-white"
-                        style={{ background: l.gradient }}
-                      >
-                        <Calendar className="w-4 h-4" />
-                      </div>
-
-                      <p className="text-xs text-gray-500 font-semibold">
-                        {l.label}
-                      </p>
+            {/* Employee Banner */}
+            <div className="rounded-2xl overflow-hidden animate-fade-in-up" style={{ background: 'linear-gradient(135deg, #059669, #10b981, #34d399)', animationDelay: '0.1s', opacity: 0 }}>
+                <div className="p-6 flex items-center gap-5">
+                    <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white text-2xl font-bold border-2 border-white/30">
+                        JD
                     </div>
-
-                    <div className="flex items-end gap-2 mb-2">
-                      <p className="text-2xl font-bold text-gray-800">
-                        {l.remaining}
-                      </p>
-
-                      <p className="text-xs text-gray-400 mb-1">
-                        / {l.total} remaining
-                      </p>
+                    <div>
+                        <h2 className="text-xl font-bold text-white">{profile.name}</h2>
+                        <p className="text-emerald-100 text-sm">{profile.position} • {profile.department}</p>
+                        <span className="inline-flex items-center gap-1.5 mt-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-white/20 text-white backdrop-blur-sm">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-200 animate-pulse" />Active Employee
+                        </span>
                     </div>
+                </div>
+            </div>
 
-                    <div className="w-full bg-gray-100 rounded-full h-2">
-                      <div
-                        className="h-2 rounded-full"
-                        style={{
-                          width: `${(l.remaining / l.total) * 100}%`,
-                          background: l.gradient,
-                        }}
-                      />
+            {/* Top Row: Profile Details + Recent Attendance */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-fade-in-up" style={{ animationDelay: '0.2s', opacity: 0 }}>
+                {/* Profile Details */}
+                <div className="pro-card">
+                    <div className="p-5">
+                        <div className="flex items-center justify-between mb-5">
+                            <div className="flex items-center gap-2">
+                                <User className="w-4 h-4 text-emerald-600" />
+                                <h3 className="text-sm font-bold text-gray-800">Profile Details</h3>
+                            </div>
+                            <button className="flex items-center gap-1 text-xs font-semibold text-emerald-600 hover:text-emerald-700 transition-colors">
+                                <Edit className="w-3.5 h-3.5" /> Request Edit
+                            </button>
+                        </div>
+                        <div className="grid grid-cols-2 gap-x-8 gap-y-4">
+                            <div>
+                                <p className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold mb-1">Full Name</p>
+                                <p className="text-sm font-semibold text-gray-800">{profile.name}</p>
+                            </div>
+                            <div>
+                                <p className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold mb-1">Employee ID</p>
+                                <p className="text-sm font-semibold text-gray-800">{profile.id}</p>
+                            </div>
+                            <div>
+                                <p className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold mb-1">Position</p>
+                                <p className="text-sm font-semibold text-gray-800">{profile.position}</p>
+                            </div>
+                            <div>
+                                <p className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold mb-1">Department</p>
+                                <p className="text-sm font-semibold text-gray-800">{profile.department}</p>
+                            </div>
+                            <div>
+                                <p className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold mb-1">Status</p>
+                                <p className="text-sm font-semibold text-gray-800">{profile.status}</p>
+                            </div>
+                            <div>
+                                <p className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold mb-1">Hire Date</p>
+                                <p className="text-sm font-semibold text-gray-800">{profile.hireDate}</p>
+                            </div>
+                            <div>
+                                <p className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold mb-1">Email</p>
+                                <p className="text-sm font-semibold text-gray-800">{profile.email}</p>
+                            </div>
+                            <div>
+                                <p className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold mb-1">Phone</p>
+                                <p className="text-sm font-semibold text-gray-800">{profile.phone}</p>
+                            </div>
+                        </div>
                     </div>
-
-                    <p className="text-[10px] text-gray-400 mt-1.5">
-                      {l.used} used
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* ATTENDANCE */}
-
-          {activeTab === "attendance" && (
-            <table className="pro-table">
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Time In</th>
-                  <th>Time Out</th>
-                  <th>Status</th>
-                  <th>Hours</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {myAttendance.map((r, i) => (
-                  <tr key={i}>
-                    <td>{r.date}</td>
-                    <td>{r.timeIn}</td>
-                    <td>{r.timeOut}</td>
-
-                    <td>
-                      <span className={`badge ${statusBadge[r.status]}`}>
-                        {r.status}
-                      </span>
-                    </td>
-
-                    <td>{r.hours}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-
-          {/* REQUESTS */}
-
-          {activeTab === "requests" && (
-            <div className="space-y-3">
-              {myRequests.map((r, i) => (
-                <div
-                  key={i}
-                  className="pro-card border border-gray-100 flex justify-between"
-                >
-                  <div>
-                    <p className="font-bold">{r.type}</p>
-
-                    <p className="text-xs text-gray-400">
-                      {r.date} • {r.details}
-                    </p>
-                  </div>
-
-                  <span className={`badge ${statusBadge[r.status]}`}>
-                    {r.status}
-                  </span>
                 </div>
-              ))}
+
+                {/* Recent Attendance */}
+                <div className="pro-card">
+                    <div className="p-5">
+                        <div className="flex items-center justify-between mb-5">
+                            <div className="flex items-center gap-2">
+                                <Clock className="w-4 h-4 text-emerald-600" />
+                                <h3 className="text-sm font-bold text-gray-800">Recent Attendance</h3>
+                            </div>
+                            <button onClick={() => navigate('/dashboard/my-attendance')} className="flex items-center gap-0.5 text-xs font-semibold text-emerald-600 hover:text-emerald-700 transition-colors">
+                                View Log <ChevronRight className="w-3.5 h-3.5" />
+                            </button>
+                        </div>
+                        <div className="space-y-4">
+                            {recentAttendance.map((entry, i) => (
+                                <div key={i} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
+                                    <div>
+                                        <p className="text-sm font-semibold text-gray-800">{entry.date}</p>
+                                        <p className="text-xs text-gray-400 mt-0.5">{entry.time}</p>
+                                    </div>
+                                    <span className="text-xs font-bold" style={{ color: attendanceBadgeColor[entry.status] }}>
+                                        {entry.status}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
             </div>
-          )}
+
+            {/* Bottom Row: Leave History + Recent Payslips */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-fade-in-up" style={{ animationDelay: '0.3s', opacity: 0 }}>
+                {/* Leave History */}
+                <div className="pro-card">
+                    <div className="p-5">
+                        <div className="flex items-center justify-between mb-5">
+                            <div className="flex items-center gap-2">
+                                <Calendar className="w-4 h-4 text-emerald-600" />
+                                <h3 className="text-sm font-bold text-gray-800">Leave History</h3>
+                            </div>
+                            <button onClick={() => navigate('/dashboard/my-leave')} className="flex items-center gap-0.5 text-xs font-semibold text-emerald-600 hover:text-emerald-700 transition-colors">
+                                Manage Leave <ChevronRight className="w-3.5 h-3.5" />
+                            </button>
+                        </div>
+                        <div className="space-y-4">
+                            {myLeaves.length > 0 ? myLeaves.map((leave) => (
+                                <div key={leave.id} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
+                                    <div>
+                                        <p className="text-sm font-bold text-gray-800">{leave.leaveType}</p>
+                                        <p className="text-xs text-gray-400 mt-0.5">{leave.startDate} - {leave.endDate}</p>
+                                    </div>
+                                    <span className={`badge ${statusBadge[leave.status]}`}>
+                                        <span className="badge-dot" />{leave.status}
+                                    </span>
+                                </div>
+                            )) : (
+                                <p className="text-sm text-gray-400 italic">No leave records found.</p>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Recent Payslips */}
+                <div className="pro-card">
+                    <div className="p-5">
+                        <div className="flex items-center justify-between mb-5">
+                            <div className="flex items-center gap-2">
+                                <FileText className="w-4 h-4 text-emerald-600" />
+                                <h3 className="text-sm font-bold text-gray-800">Recent Payslips</h3>
+                            </div>
+                        </div>
+                        <div className="space-y-4">
+                            {payslips.map((slip, i) => (
+                                <div key={i} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
+                                    <div>
+                                        <p className="text-sm font-bold text-gray-800">{slip.period}</p>
+                                        <p className="text-xs text-gray-400 mt-0.5">Paid: {slip.paidDate}</p>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-sm font-bold text-emerald-600">{slip.amount}</span>
+                                        <button className="btn-ghost btn-icon text-blue-500 hover:bg-blue-50" title="View"><Eye className="w-4 h-4" /></button>
+                                        <button className="btn-ghost btn-icon text-gray-400 hover:bg-gray-100" title="Download"><Download className="w-4 h-4" /></button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-
-      {/* MODAL */}
-
-      {showApplyModal && (
-        <div className="pro-modal-overlay">
-          <div className="pro-modal max-w-md">
-            <div className="pro-modal-header">
-              <h3>Apply for Leave</h3>
-
-              <button
-                onClick={() => setShowApplyModal(false)}
-                className="btn-ghost btn-icon"
-              >
-                <X className="w-5 h-5 text-gray-400" />
-              </button>
-            </div>
-
-            <div className="pro-modal-body space-y-4">
-              <div>
-                <label className="pro-label">Leave Type</label>
-
-                <select className="pro-select">
-                  <option>Vacation Leave</option>
-                  <option>Sick Leave</option>
-                  <option>Emergency Leave</option>
-                </select>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="pro-label">Start Date</label>
-
-                  <input type="date" className="pro-input" />
-                </div>
-
-                <div>
-                  <label className="pro-label">End Date</label>
-
-                  <input type="date" className="pro-input" />
-                </div>
-              </div>
-
-              <div>
-                <label className="pro-label">Reason</label>
-
-                <textarea rows={3} className="pro-input" />
-              </div>
-            </div>
-
-            <div className="pro-modal-footer">
-              <button
-                onClick={() => setShowApplyModal(false)}
-                className="btn btn-secondary"
-              >
-                Cancel
-              </button>
-
-              <button
-                onClick={() => setShowApplyModal(false)}
-                className="btn btn-primary"
-              >
-                Submit Application
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
+    );
 };
 
 export default EmployeeSelfService;
