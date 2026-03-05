@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { AttendanceProvider } from './context/AttendanceContext';
+import { SidebarProvider } from './context/SidebarContext';
 import { LeaveProvider } from './context/LeaveContext';
 import Login from './pages/Login';
 import ForgotPassword from './pages/ForgotPassword';
@@ -59,6 +60,15 @@ const AdminOnly = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
+// Route guard that redirects to login if user is not authenticated
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const { isLoggedIn } = useAuth();
+  if (!isLoggedIn) {
+    return <Navigate to="/login" replace />;
+  }
+  return <>{children}</>;
+};
+
 function AppRoutes() {
   return (
     <Routes>
@@ -67,7 +77,7 @@ function AppRoutes() {
       <Route path="/forgot-password" element={<ForgotPassword />} />
 
       {/* Protected Routes */}
-      <Route path="/dashboard" element={<Layout />}>
+      <Route path="/dashboard" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
         <Route index element={<Dashboard />} />
 
         {/* Admin-only pages */}
@@ -108,9 +118,11 @@ function App() {
     <AuthProvider>
       <AttendanceProvider>
         <LeaveProvider>
-          <Router>
-            <AppRoutes />
-          </Router>
+          <SidebarProvider>
+            <Router>
+              <AppRoutes />
+            </Router>
+          </SidebarProvider>
         </LeaveProvider>
       </AttendanceProvider>
     </AuthProvider>

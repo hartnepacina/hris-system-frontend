@@ -11,6 +11,8 @@ interface Employee {
     contact: string;
     email: string;
     hireDate: string;
+    emergencyContactName?: string;
+    emergencyContactNumber?: string;
 }
 
 const initialEmployees: Employee[] = [
@@ -36,7 +38,16 @@ const EmployeeList = () => {
     const [showEditModal, setShowEditModal] = useState(false);
     const [showViewPanel, setShowViewPanel] = useState(false);
     const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
-    const [formData, setFormData] = useState({ name: '', position: '', department: '', status: 'Active' as Employee['status'], contact: '', email: '' });
+    const [formData, setFormData] = useState({
+        name: '',
+        position: '',
+        department: '',
+        status: 'Active' as Employee['status'],
+        contact: '',
+        email: '',
+        emergencyContactName: '',
+        emergencyContactNumber: ''
+    });
 
     const filtered = employees.filter(e => {
         const matchSearch = e.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -61,10 +72,12 @@ const EmployeeList = () => {
             contact: formData.contact,
             email: formData.email,
             hireDate: new Date().toISOString().split('T')[0],
+            emergencyContactName: formData.emergencyContactName,
+            emergencyContactNumber: formData.emergencyContactNumber,
         };
         setEmployees([...employees, newEmp]);
         setShowAddModal(false);
-        setFormData({ name: '', position: '', department: '', status: 'Active', contact: '', email: '' });
+        setFormData({ name: '', position: '', department: '', status: 'Active', contact: '', email: '', emergencyContactName: '', emergencyContactNumber: '' });
     };
 
     const handleEdit = () => {
@@ -74,10 +87,18 @@ const EmployeeList = () => {
         setSelectedEmployee(null);
     };
 
-
     const openEdit = (emp: Employee) => {
         setSelectedEmployee(emp);
-        setFormData({ name: emp.name, position: emp.position, department: emp.department, status: emp.status, contact: emp.contact, email: emp.email });
+        setFormData({
+            name: emp.name,
+            position: emp.position,
+            department: emp.department,
+            status: emp.status,
+            contact: emp.contact,
+            email: emp.email,
+            emergencyContactName: emp.emergencyContactName || '',
+            emergencyContactNumber: emp.emergencyContactNumber || ''
+        });
         setShowEditModal(true);
     };
 
@@ -86,53 +107,98 @@ const EmployeeList = () => {
         setShowViewPanel(true);
     };
 
-
     const FormFields = ({ onSubmit, submitLabel }: { onSubmit: () => void; submitLabel: string }) => (
         <div className="space-y-4">
+            {/* Employee Name - now a text input */}
             <div>
                 <label className="pro-label">Full Name</label>
-                <select
+                <input
+                    type="text"
                     value={formData.name}
                     onChange={e => setFormData({ ...formData, name: e.target.value })}
-                    className="pro-select"
-                >
-                    <option value="" disabled>Select Employee</option>
-                    <option value="Dela Cruz, Juan">Dela Cruz, Juan</option>
-                    <option value="Santos, Maria">Santos, Maria</option>
-                    <option value="Reyes, Jose">Reyes, Jose</option>
-                    <option value="Garcia, Ana">Garcia, Ana</option>
-                    <option value="Bautista, Pedro">Bautista, Pedro</option>
-                    <option value="Fernandez, Rosa">Fernandez, Rosa</option>
-                </select>
+                    className="pro-input"
+                />
             </div>
+            {/* Position and Department */}
             <div className="grid grid-cols-2 gap-4">
                 <div>
                     <label className="pro-label">Position</label>
-                    <input type="text" value={formData.position} onChange={e => setFormData({ ...formData, position: e.target.value })} className="pro-input" />
+                    <input
+                        type="text"
+                        value={formData.position}
+                        onChange={e => setFormData({ ...formData, position: e.target.value })}
+                        className="pro-input"
+                    />
                 </div>
                 <div>
                     <label className="pro-label">Department</label>
-                    <input type="text" value={formData.department} onChange={e => setFormData({ ...formData, department: e.target.value })} className="pro-input" />
+                    <input
+                        type="text"
+                        value={formData.department}
+                        onChange={e => setFormData({ ...formData, department: e.target.value })}
+                        className="pro-input"
+                    />
                 </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-                <div>
+            {/* Contact Number and Email side by side */}
+            <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex-1">
                     <label className="pro-label">Contact Number</label>
-                    <input type="text" value={formData.contact} onChange={e => setFormData({ ...formData, contact: e.target.value })} className="pro-input" />
+                    <input
+                        type="text"
+                        value={formData.contact}
+                        onChange={e => setFormData({ ...formData, contact: e.target.value })}
+                        className="pro-input"
+                    />
                 </div>
-                <div>
+                <div className="flex-1">
                     <label className="pro-label">Email</label>
-                    <input type="text" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} className="pro-input" />
+                    <input
+                        type="text"
+                        value={formData.email}
+                        onChange={e => setFormData({ ...formData, email: e.target.value })}
+                        className="pro-input"
+                    />
                 </div>
             </div>
+            {/* Emergency Contact Section */}
+            <div className="border-t border-gray-200 pt-4">
+                <h4 className="font-semibold mb-2">Emergency Contact</h4>
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label className="pro-label">Full Name</label>
+                        <input
+                            type="text"
+                            value={formData.emergencyContactName}
+                            onChange={e => setFormData({ ...formData, emergencyContactName: e.target.value })}
+                            className="pro-input"
+                        />
+                    </div>
+                    <div>
+                        <label className="pro-label">Contact Number</label>
+                        <input
+                            type="text"
+                            value={formData.emergencyContactNumber}
+                            onChange={e => setFormData({ ...formData, emergencyContactNumber: e.target.value })}
+                            className="pro-input"
+                        />
+                    </div>
+                </div>
+            </div>
+            {/* Employment Status */}
             <div>
                 <label className="pro-label">Employment Status</label>
-                <select value={formData.status} onChange={e => setFormData({ ...formData, status: e.target.value as Employee['status'] })} className="pro-select">
+                <select
+                    value={formData.status}
+                    onChange={e => setFormData({ ...formData, status: e.target.value as Employee['status'] })}
+                    className="pro-select"
+                >
                     <option value="Active">Active</option>
                     <option value="On Leave">On Leave</option>
                     <option value="Inactive">Inactive</option>
                 </select>
             </div>
+            {/* Buttons */}
             <div className="pro-modal-footer !px-0 !pb-0">
                 <button onClick={() => { setShowAddModal(false); setShowEditModal(false); }} className="btn btn-secondary">Cancel</button>
                 <button onClick={onSubmit} className="btn btn-primary">{submitLabel}</button>
@@ -155,7 +221,13 @@ const EmployeeList = () => {
                     <h1>Employee Information Management</h1>
                     <p>Manage employee records and information</p>
                 </div>
-                <button onClick={() => { setFormData({ name: '', position: '', department: '', status: 'Active', contact: '', email: '' }); setShowAddModal(true); }} className="btn btn-primary">
+                <button
+                    onClick={() => {
+                        setFormData({ name: '', position: '', department: '', status: 'Active', contact: '', email: '', emergencyContactName: '', emergencyContactNumber: '' });
+                        setShowAddModal(true);
+                    }}
+                    className="btn btn-primary"
+                >
                     <Plus className="w-4 h-4" /> Add Employee
                 </button>
             </div>
@@ -187,11 +259,20 @@ const EmployeeList = () => {
                 <div className="flex items-center gap-3">
                     <div className="pro-search flex-1 max-w-md">
                         <Search className="search-icon" />
-                        <input type="text" placeholder="Search by name, ID, or position..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
+                        <input
+                            type="text"
+                            placeholder="Search by name, ID, or position..."
+                            value={searchTerm}
+                            onChange={e => setSearchTerm(e.target.value)}
+                        />
                     </div>
                     <div className="flex items-center gap-2 ml-auto">
                         <Filter className="w-4 h-4 text-gray-400" />
-                        <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} className="pro-select !w-auto !py-2">
+                        <select
+                            value={filterStatus}
+                            onChange={e => setFilterStatus(e.target.value)}
+                            className="pro-select !w-auto !py-2"
+                        >
                             <option value="All">All Status</option>
                             <option value="Active">Active</option>
                             <option value="On Leave">On Leave</option>
@@ -216,39 +297,44 @@ const EmployeeList = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {filtered.map(emp => (
-                                <tr key={emp.id}>
-                                    <td className="font-mono text-xs">{emp.employeeId}</td>
-                                    <td>
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-                                                {emp.name.charAt(0)}
+                            {filtered.length > 0 ? (
+                                filtered.map(emp => (
+                                    <tr key={emp.id}>
+                                        <td className="font-mono text-xs">{emp.employeeId}</td>
+                                        <td>
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                                                    {emp.name.charAt(0)}
+                                                </div>
+                                                <span className="font-medium text-gray-800">{emp.name}</span>
                                             </div>
-                                            <span className="font-medium text-gray-800">{emp.name}</span>
-                                        </div>
-                                    </td>
-                                    <td>{emp.position}</td>
-                                    <td>{emp.department}</td>
-                                    <td>
-                                        <span className={`badge ${statusBadge[emp.status]}`}>
-                                            <span className="badge-dot" />
-                                            {emp.status}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div className="flex items-center justify-center gap-1">
-                                            <button onClick={() => openView(emp)} className="btn-ghost btn-icon text-blue-500 hover:bg-blue-50" title="View">
-                                                <Eye className="w-4 h-4" />
-                                            </button>
-                                            <button onClick={() => openEdit(emp)} className="btn-ghost btn-icon text-emerald-600 hover:bg-emerald-50" title="Edit">
-                                                <Edit className="w-4 h-4" />
-                                            </button>
-                                        </div>
+                                        </td>
+                                        <td>{emp.position}</td>
+                                        <td>{emp.department}</td>
+                                        <td>
+                                            <span className={`badge ${statusBadge[emp.status]}`}>
+                                                <span className="badge-dot" />
+                                                {emp.status}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div className="flex items-center justify-center gap-1">
+                                                <button onClick={() => openView(emp)} className="btn-ghost btn-icon text-blue-500 hover:bg-blue-50" title="View">
+                                                    <Eye className="w-4 h-4" />
+                                                </button>
+                                                <button onClick={() => openEdit(emp)} className="btn-ghost btn-icon text-emerald-600 hover:bg-emerald-50" title="Edit">
+                                                    <Edit className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan={6} className="text-center py-12 text-gray-400">
+                                        No employees found matching your criteria.
                                     </td>
                                 </tr>
-                            ))}
-                            {filtered.length === 0 && (
-                                <tr><td colSpan={6} className="text-center py-12 text-gray-400">No employees found matching your criteria.</td></tr>
                             )}
                         </tbody>
                     </table>
@@ -259,12 +345,17 @@ const EmployeeList = () => {
             {showAddModal && (
                 <div className="pro-modal-overlay">
                     <div className="pro-modal max-w-lg" onClick={e => e.stopPropagation()}>
-                        <div className="pro-modal-header">
+                        <div className="pro-modal-header flex justify-between items-center">
                             <h3>Add New Employee</h3>
-                            <button onClick={() => setShowAddModal(false)} className="btn-ghost btn-icon"><X className="w-5 h-5 text-gray-400" /></button>
+                            <button onClick={() => setShowAddModal(false)} className="btn-ghost btn-icon">
+                                <X className="w-5 h-5 text-gray-400" />
+                            </button>
                         </div>
                         <div className="pro-modal-body">
-                            <FormFields onSubmit={handleAdd} submitLabel="Add Employee" />
+                            <FormFields
+                                onSubmit={handleAdd}
+                                submitLabel="Add Employee"
+                            />
                         </div>
                     </div>
                 </div>
@@ -274,12 +365,17 @@ const EmployeeList = () => {
             {showEditModal && (
                 <div className="pro-modal-overlay">
                     <div className="pro-modal max-w-lg" onClick={e => e.stopPropagation()}>
-                        <div className="pro-modal-header">
+                        <div className="pro-modal-header flex justify-between items-center">
                             <h3>Edit Employee</h3>
-                            <button onClick={() => setShowEditModal(false)} className="btn-ghost btn-icon"><X className="w-5 h-5 text-gray-400" /></button>
+                            <button onClick={() => setShowEditModal(false)} className="btn-ghost btn-icon">
+                                <X className="w-5 h-5 text-gray-400" />
+                            </button>
                         </div>
                         <div className="pro-modal-body">
-                            <FormFields onSubmit={handleEdit} submitLabel="Save Changes" />
+                            <FormFields
+                                onSubmit={handleEdit}
+                                submitLabel="Save Changes"
+                            />
                         </div>
                     </div>
                 </div>
@@ -293,7 +389,9 @@ const EmployeeList = () => {
                         <div className="p-6">
                             <div className="flex items-center justify-between mb-6">
                                 <h3 className="text-lg font-bold text-gray-900">Employee Details</h3>
-                                <button onClick={() => setShowViewPanel(false)} className="btn-ghost btn-icon"><X className="w-5 h-5 text-gray-400" /></button>
+                                <button onClick={() => setShowViewPanel(false)} className="btn-ghost btn-icon">
+                                    <X className="w-5 h-5 text-gray-400" />
+                                </button>
                             </div>
                             <div className="flex flex-col items-center mb-6">
                                 <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center text-white text-3xl font-bold mb-4 shadow-lg">
