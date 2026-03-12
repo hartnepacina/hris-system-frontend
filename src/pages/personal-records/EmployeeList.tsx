@@ -11,16 +11,19 @@ interface Employee {
   contact: string;
   email: string;
   hireDate: string;
-  emergencyContact?: string; // optional field
+  emergencyName?: string;
+  emergencyContact?: string;
+  address?: string;
 }
 
+// Initial Employees Data
 const initialEmployees: Employee[] = [
-  { id: 1, employeeId: 'EMP-2024-001', name: 'Dela Cruz, Juan', position: 'Administrative Officer', department: 'Admin', status: 'Active', contact: '09171234567', email: 'juan@simplevia.com', hireDate: '2022-03-15' },
-  { id: 2, employeeId: 'EMP-2024-002', name: 'Santos, Maria', position: 'Project Manager', department: 'Operations', status: 'On Leave', contact: '09182345678', email: 'maria@simplevia.com', hireDate: '2021-06-10' },
-  { id: 3, employeeId: 'EMP-2024-003', name: 'Reyes, Jose', position: 'Technical Assistant', department: 'IT', status: 'Active', contact: '09193456789', email: 'jose@simplevia.com', hireDate: '2023-01-20' },
-  { id: 4, employeeId: 'EMP-2024-004', name: 'Garcia, Ana', position: 'Administrative Aide', department: 'Admin', status: 'Active', contact: '09204567890', email: 'ana@simplevia.com', hireDate: '2023-08-01' },
-  { id: 5, employeeId: 'EMP-2024-005', name: 'Bautista, Pedro', position: 'Driver', department: 'Operations', status: 'Inactive', contact: '09215678901', email: 'pedro@simplevia.com', hireDate: '2020-11-05' },
-  { id: 6, employeeId: 'EMP-2024-006', name: 'Fernandez, Rosa', position: 'HR Specialist', department: 'HR', status: 'Active', contact: '09226789012', email: 'rosa@simplevia.com', hireDate: '2022-09-12' },
+  { id: 1, employeeId: 'EMP-2024-001', name: 'Dela Cruz, Juan', position: 'Administrative Officer', department: 'Admin', status: 'Active', contact: '09171234567', email: 'juan@simplevia.com', hireDate: '2022-03-15', emergencyName: 'Maria Cruz', emergencyContact: '09171234568', address: '123 Street' },
+  { id: 2, employeeId: 'EMP-2024-002', name: 'Santos, Maria', position: 'Project Manager', department: 'Operations', status: 'On Leave', contact: '09182345678', email: 'maria@simplevia.com', hireDate: '2021-06-10', emergencyName: 'Carlos Santos', emergencyContact: '09182345679', address: '456 Avenue' },
+  { id: 3, employeeId: 'EMP-2024-003', name: 'Reyes, Jose', position: 'Technical Assistant', department: 'IT', status: 'Active', contact: '09193456789', email: 'jose@simplevia.com', hireDate: '2023-01-20', emergencyName: 'Luis Reyes', emergencyContact: '09193456790', address: '789 Boulevard' },
+  { id: 4, employeeId: 'EMP-2024-004', name: 'García, Ana', position: 'Administrative Aide', department: 'Admin', status: 'Active', contact: '09204567890', email: 'ana@simplevia.com', hireDate: '2023-08-01', emergencyName: 'Maria García', emergencyContact: '09204567891', address: '321 Lane' },
+  { id: 5, employeeId: 'EMP-2024-005', name: 'Bautista, Pedro', position: 'Driver', department: 'Operations', status: 'Inactive', contact: '09215678901', email: 'pedro@simplevia.com', hireDate: '2020-11-05', emergencyName: 'Maria Bautista', emergencyContact: '09215678902', address: '654 Road' },
+  { id: 6, employeeId: 'EMP-2024-006', name: 'Fernandez, Rosa', position: 'HR Specialist', department: 'HR', status: 'Active', contact: '09226789012', email: 'rosa@simplevia.com', hireDate: '2022-09-12', emergencyName: 'Carlos Fernandez', emergencyContact: '09226789013', address: '987 Street' },
 ];
 
 const statusBadge: Record<string, string> = {
@@ -38,6 +41,7 @@ const EmployeeList = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showViewPanel, setShowViewPanel] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
+
   const [formData, setFormData] = useState<{
     firstName: string;
     lastName: string;
@@ -46,8 +50,11 @@ const EmployeeList = () => {
     status: 'Active' | 'On Leave' | 'Inactive';
     contact: string;
     email: string;
+    address: string;
     hireDate: string;
+    emergencyName: string;
     emergencyContact: string;
+    employeeId: string;
   }>({
     firstName: '',
     lastName: '',
@@ -56,8 +63,11 @@ const EmployeeList = () => {
     status: 'Active',
     contact: '',
     email: '',
+    address: '',
     hireDate: '',
+    emergencyName: '',
     emergencyContact: '',
+    employeeId: '',
   });
 
   const filtered = employees.filter(e => {
@@ -76,7 +86,7 @@ const EmployeeList = () => {
   const handleAdd = () => {
     const newEmp: Employee = {
       id: Date.now(),
-      employeeId: `EMP-2024-${String(employees.length + 1).padStart(3, '0')}`,
+      employeeId: formData.employeeId || `EMP-2024-${String(employees.length + 1).padStart(3, '0')}`,
       name: `${formData.lastName}, ${formData.firstName}`,
       position: formData.position,
       department: formData.department,
@@ -84,11 +94,13 @@ const EmployeeList = () => {
       contact: formData.contact,
       email: formData.email,
       hireDate: formData.hireDate || new Date().toISOString().split('T')[0],
+      emergencyName: formData.emergencyName,
       emergencyContact: formData.emergencyContact,
+      address: formData.address,
     };
     setEmployees([...employees, newEmp]);
     setShowAddModal(false);
-    setFormData({ firstName: '', lastName: '', position: '', department: '', status: 'Active', contact: '', email: '', hireDate: '', emergencyContact: '' });
+    setFormData({ firstName: '', lastName: '', position: '', department: '', status: 'Active', contact: '', email: '', address: '', hireDate: '', emergencyName: '', emergencyContact: '', employeeId: '' });
   };
 
   const handleEdit = () => {
@@ -102,7 +114,9 @@ const EmployeeList = () => {
       contact: formData.contact,
       email: formData.email,
       hireDate: formData.hireDate,
+      emergencyName: formData.emergencyName,
       emergencyContact: formData.emergencyContact,
+      address: formData.address,
     } : e));
     setShowEditModal(false);
     setSelectedEmployee(null);
@@ -120,7 +134,10 @@ const EmployeeList = () => {
       contact: emp.contact,
       email: emp.email,
       hireDate: emp.hireDate,
+      emergencyName: emp.emergencyName || '',
       emergencyContact: emp.emergencyContact || '',
+      employeeId: emp.employeeId,
+      address: emp.address || '',
     });
     setShowEditModal(true);
   };
@@ -132,10 +149,11 @@ const EmployeeList = () => {
 
   const renderFormFields = (onSubmit: () => void, submitLabel: string) => (
     <div className="space-y-4">
-      {/* Full Name */}
+      {/* Personal Information */}
+      <h4 className="font-semibold text-gray-700 mb-2">Personal Information</h4>
       <div>
         <label className="pro-label">Full Name</label>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-2 mb-2">
           <input
             placeholder="First Name"
             className="pro-input"
@@ -150,62 +168,123 @@ const EmployeeList = () => {
           />
         </div>
       </div>
-      {/* Position & Department */}
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="pro-label">Position</label>
-          <input type="text" value={formData.position} onChange={(e) => setFormData({ ...formData, position: e.target.value })} className="pro-input" />
-        </div>
-        <div>
-          <label className="pro-label">Department</label>
-          <input type="text" value={formData.department} onChange={(e) => setFormData({ ...formData, department: e.target.value })} className="pro-input" />
-        </div>
-      </div>
-      {/* Contact & Email */}
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="pro-label">Contact Number</label>
-          <input type="text" value={formData.contact} onChange={(e) => setFormData({ ...formData, contact: e.target.value })} className="pro-input" />
-        </div>
-        <div>
-          <label className="pro-label">Email</label>
-          <input type="text" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="pro-input" />
-        </div>
-      </div>
-      {/* Hire Date */}
       <div>
-        <label className="pro-label">Hire Date</label>
+        <label className="pro-label">Email</label>
         <input
-          type="date"
+          type="email"
           className="pro-input"
-          value={formData.hireDate}
-          onChange={(e) => setFormData({ ...formData, hireDate: e.target.value })}
+          value={formData.email}
+          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+        />
+      </div>
+      <div>
+        <label className="pro-label">Phone</label>
+        <input
+          type="text"
+          className="pro-input"
+          value={formData.contact}
+          onChange={(e) => setFormData({ ...formData, contact: e.target.value })}
+        />
+      </div>
+      <div>
+        <label className="pro-label">Address</label>
+        <input
+          type="text"
+          className="pro-input"
+          value={formData.address}
+          onChange={(e) => setFormData({ ...formData, address: e.target.value })}
         />
       </div>
       {/* Emergency Contact */}
-      <div>
-        <label className="pro-label">Emergency Contact</label>
+      <h4 className="font-semibold text-gray-700 mb-2">Emergency Contact</h4>
+      <div className="flex gap-4">
+      <div className="flex-1">
+      <label className="pro-label">Name</label>
         <input
-          type="text"
-          placeholder="Name and Contact"
-          className="pro-input"
-          value={formData.emergencyContact}
-          onChange={(e) => setFormData({ ...formData, emergencyContact: e.target.value })}
+            className="pro-input"
+            value={formData.emergencyName}
+            onChange={(e) => setFormData({ ...formData, emergencyName: e.target.value })}
+         />
+        </div>
+    <div className="flex-1">
+    <label className="pro-label">Phone</label>
+        <input
+            className="pro-input"
+            value={formData.emergencyContact}
+            onChange={(e) => setFormData({ ...formData, emergencyContact: e.target.value })}
         />
+        </div>
+    </div>
+      {/* Employment Details */}
+      <h4 className="font-semibold text-gray-700 mb-2 mt-4">Employment Details</h4>
+      <div className="grid grid-cols-2 gap-4 mb-2">
+        <div>
+          <label className="pro-label">Employee ID</label>
+          <input
+            type="text"
+            className="pro-input"
+            value={formData.employeeId}
+            onChange={(e) => setFormData({ ...formData, employeeId: e.target.value })}
+          />
+        </div>
+        <div>
+          <label className="pro-label">Position</label>
+          <input
+            type="text"
+            className="pro-input"
+            value={formData.position}
+            onChange={(e) => setFormData({ ...formData, position: e.target.value })}
+          />
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-4 mb-2">
+        <div>
+          <label className="pro-label">Department</label>
+          <input
+            type="text"
+            className="pro-input"
+            value={formData.department}
+            onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+          />
+        </div>
+        <div>
+          <label className="pro-label">Hire Date</label>
+          <input
+            type="date"
+            className="pro-input"
+            value={formData.hireDate}
+            onChange={(e) => setFormData({ ...formData, hireDate: e.target.value })}
+          />
+        </div>
       </div>
       {/* Status */}
       <div>
         <label className="pro-label">Employment Status</label>
-        <select value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value as Employee['status'] })} className="pro-select">
+        <select
+          value={formData.status}
+          onChange={(e) => setFormData({ ...formData, status: e.target.value as Employee['status'] })}
+          className="pro-select"
+        >
           <option value="Active">Active</option>
           <option value="On Leave">On Leave</option>
           <option value="Inactive">Inactive</option>
         </select>
       </div>
+
       {/* Buttons */}
       <div className="pro-modal-footer !px-0 !pb-0">
-        <button onClick={() => { setShowAddModal(false); setShowEditModal(false); }} className="btn btn-secondary">Cancel</button>
-        <button onClick={onSubmit} className="btn btn-primary">{submitLabel}</button>
+        <button
+          onClick={() => {
+            setShowAddModal(false);
+            setShowEditModal(false);
+          }}
+          className="btn btn-secondary"
+        >
+          Cancel
+        </button>
+        <button onClick={onSubmit} className="btn btn-primary">
+          {submitLabel}
+        </button>
       </div>
     </div>
   );
@@ -218,7 +297,26 @@ const EmployeeList = () => {
           <h1>Employee Information Management</h1>
           <p>Manage employee records and information</p>
         </div>
-        <button onClick={() => { setFormData({ firstName: '', lastName: '', position: '', department: '', status: 'Active', contact: '', email: '', hireDate: '', emergencyContact: '' }); setShowAddModal(true); }} className="btn btn-primary">
+        <button
+          onClick={() => {
+            setFormData({
+              firstName: '',
+              lastName: '',
+              position: '',
+              department: '',
+              status: 'Active',
+              contact: '',
+              email: '',
+              address: '',
+              hireDate: '',
+              emergencyName: '',
+              emergencyContact: '',
+              employeeId: '',
+            });
+            setShowAddModal(true);
+          }}
+          className="btn btn-primary"
+        >
           <Plus className="w-4 h-4" /> Add Employee
         </button>
       </div>
@@ -255,11 +353,20 @@ const EmployeeList = () => {
         <div className="flex items-center gap-3">
           <div className="pro-search flex-1 max-w-md">
             <Search className="search-icon" />
-            <input placeholder="Search by name, ID, or position..." className="outline-none flex-1" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+            <input
+              placeholder="Search by name, ID, or position..."
+              className="outline-none flex-1"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </div>
           <div className="flex items-center gap-2 ml-auto">
             <Filter className="w-4 h-4 text-gray-400" />
-            <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="pro-select !w-auto !py-2">
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="pro-select !w-auto !py-2"
+            >
               <option value="All">All Status</option>
               <option value="Active">Active</option>
               <option value="On Leave">On Leave</option>
@@ -291,7 +398,6 @@ const EmployeeList = () => {
               ) : (
                 filtered.map((emp) => (
                   <tr key={emp.id} className="hover:no-underline hover:bg-white">
-                    {/* Remove hover effects that cause movement or scale */}
                     <td className="font-mono text-xs">{emp.employeeId}</td>
                     <td>
                       <div className="flex items-center gap-3">
@@ -352,13 +458,10 @@ const EmployeeList = () => {
         </div>
       )}
 
-      {/* View Employee Panel (slide in from right) */}
+      {/* View Employee Panel */}
       {showViewPanel && selectedEmployee && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-end z-50">
-          <div
-            className="w-full max-w-md bg-white h-full overflow-y-auto shadow-2xl animate-slide-in-right"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className="w-full max-w-md bg-white h-full overflow-y-auto shadow-2xl animate-slide-in-right" onClick={(e) => e.stopPropagation()}>
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-lg font-bold text-gray-900">Employee Details</h3>
@@ -377,15 +480,18 @@ const EmployeeList = () => {
                   <span className="badge-dot" /> {selectedEmployee.status}
                 </span>
               </div>
-              {/* Details list */}
+              {/* Details list with separated emergency contact info */}
               <div className="space-y-4 border-t border-gray-100 pt-6">
                 {[
                   ['Employee ID', selectedEmployee.employeeId],
+                  ['Name', selectedEmployee.name],
                   ['Department', selectedEmployee.department],
                   ['Contact', selectedEmployee.contact],
                   ['Email', selectedEmployee.email],
                   ['Hire Date', selectedEmployee.hireDate],
-                  ['Emergency Contact', selectedEmployee.emergencyContact],
+                  ['Emergency Contact Name', selectedEmployee.emergencyName],
+                  ['Emergency Contact Phone Number', selectedEmployee.emergencyContact],
+                  ['Address', selectedEmployee.address],
                 ].map(([label, value]) => (
                   <div key={label} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
                     <span className="text-xs text-gray-400 uppercase tracking-wider font-medium">{label}</span>
@@ -398,7 +504,7 @@ const EmployeeList = () => {
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
 export default EmployeeList;
